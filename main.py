@@ -31,6 +31,13 @@ menu = [
     #[InlineKeyboardButton(text="🔎 Связаться с техподдержкой", callback_data="chat")]
 ]
 
+mainMenuForAdmin = [
+    [InlineKeyboardButton(text="💳 Товары", callback_data="menu"),
+    InlineKeyboardButton(text="💰 Работа", callback_data="work")],
+    [InlineKeyboardButton(text="💳 Админка", callback_data="admin")]
+    #[InlineKeyboardButton(text="🔎 Связаться с техподдержкой", callback_data="chat")]
+]
+
 menuAdmin = [
     [InlineKeyboardButton(text="Добавить товар", callback_data="addProduct"),
     InlineKeyboardButton(text="Список товаров", callback_data="menu")],
@@ -40,6 +47,7 @@ menuAdmin = [
 ]
 
 menu = InlineKeyboardMarkup(inline_keyboard=menu)
+menuForAdmin = InlineKeyboardMarkup(inline_keyboard=mainMenuForAdmin)
 menuAdmin = InlineKeyboardMarkup(inline_keyboard=menuAdmin)
 #exit_kb = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="◀️ Выйти в меню")]], resize_keyboard=True)
 #iexit_kb = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="◀️ Выйти в меню", callback_data="menu")]])
@@ -78,7 +86,9 @@ async def command_start_handler(message: Message) -> None:
 
     menuLocal = menu
     if await is_admin(message.chat.id):
-        menuLocal.inline_keyboard.append([InlineKeyboardButton(text="💳 Админка", callback_data="admin")])
+        #print('test')
+        menuLocal = menuForAdmin
+    #print(menuLocal)
     await message.answer(f"Добро пожаловать в наш магазин. Здесь можно приобрести всякую всячину", reply_markup=menuLocal)
 
 
@@ -91,7 +101,8 @@ async def command_start_handler(message: Message) -> None:
 
     menuLocal = menu
     if await is_admin(message.chat.id):
-        menuLocal.inline_keyboard.append([InlineKeyboardButton(text="💳 Админка", callback_data="admin")])
+        menuLocal = menuForAdmin
+    #print(menuLocal)
     await message.answer(f"======Меню=======", reply_markup=menuLocal)
 
 
