@@ -103,6 +103,7 @@ class FSMAdminCommands(StatesGroup):
     delete_worker = State()
     delete_manager = State()
     delete_admin = State()
+    chat_all = State()
 
 @router.message(Command(commands=["contacts"]))
 async def command_start_handler(message: Message) -> None:
@@ -115,6 +116,40 @@ async def command_start_handler(message: Message) -> None:
         await bot.send_message(chat_id=message.chat.id,
                                text=f"<b>UserName</b> @{item['Name']}\nChat_id: {item['Chat_id']}",
                                reply_markup=chatMenu)
+
+
+@router.message(Command(commands=["chat-all"]))
+async def command_chat_all_handler(message: Message, state=FSMContext) -> None:
+    if not await is_admin(message.chat.id):
+        return
+
+    await state.set_state(FSMAdminCommands.chat_all)
+    await message.reply('Отправленное ниже сообщение перешлёться всем контактам')
+
+
+@router.message(FSMAdminCommands.chat_all)
+async def command_chat_all_handler(message: Message, state=FSMContext) -> None:
+    if not await is_admin(message.chat.id):
+        return
+    contacts = await sqllite_db.sql_get_contacts()
+    for item in contacts:
+        if (message.text):
+            await bot.send_message(chat_id=item["Chat_id"], text=message.text)
+        if message.photo:
+            sendedPhotos = []
+            for photoItem in message.photo:
+                if photoItem.width > 100 or photoItem.height > 100:
+                    continue
+                if photoItem.file_unique_id not in sendedPhotos:
+                    await bot.send_photo(chat_id=item["Chat_id"], photo=photoItem.file_id,
+                                         caption=message.caption)
+                    sendedPhotos.append(photoItem.file_unique_id)
+        if message.location:
+            await bot.send_location(chat_id=item["Chat_id"], longitude=message.location.longitude,
+                                    latitude=message.location.latitude,
+                                    horizontal_accuracy=message.location.horizontal_accuracy)
+    await state.clear()
+    await message.reply('Данное сообщение отправлено всем контактам')
 
 @router.message(Command(commands=["workers"]))
 async def command_start_handler(message: Message) -> None:
