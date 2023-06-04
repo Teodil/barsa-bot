@@ -632,6 +632,7 @@ async def add_spec_user_handler(message: Message, state: FSMContext):
         if await is_admin(data['chat_id']) == False:
             await sqllite_db.sql_add_admin(data['name'],data['chat_id'])
             await message.reply(f"Пользователь {data['name']} теперь админ")
+            await state.clear()
         else:
             await message.reply(f"Пользователь {data['name']} уже является админом")
     else:
@@ -647,6 +648,7 @@ async def add_spec_user_handler(message: Message, state: FSMContext):
         if await is_manager(data['chat_id']) == False:
             await sqllite_db.sql_add_manager(data['name'], data['chat_id'])
             await message.reply(f"Пользователь {data['name']} теперь менеджер")
+            await state.clear()
         else:
             await message.reply(f"Пользователь {data['name']} уже является менеджером")
     else:
@@ -663,6 +665,7 @@ async def add_spec_user_handler(message: Message, state: FSMContext):
         if await is_worker(data['chat_id']) == False:
             await sqllite_db.sql_add_worker(data['name'], data['chat_id'])
             await message.reply(f"Пользователь {data['name']} теперь сотрудник")
+            await state.clear()
         else:
             await message.reply(f"Пользователь {data['name']} уже является сотрудником")
     else:
