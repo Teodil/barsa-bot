@@ -546,7 +546,7 @@ async def callback_query_buy(callback_query: types.CallbackQuery, state=None):
     buttons = [[InlineKeyboardButton(text="Написать клиенту", callback_data=f"order-chat-{callback_query.message.chat.id}")]]
     orderChat = InlineKeyboardMarkup(inline_keyboard=buttons)
     await bot.send_message(chat_id=techGroupsIds["Orders"], text=orderText,reply_markup=orderChat)
-    await bot.send_message(chat_id=callback_query.message.chat.id, text="Заказ отправлен менеджеру\nСкоро с вами свяжуться для уточнения деталей!")
+    await bot.send_message(chat_id=callback_query.message.chat.id, text=f"Ваш Заказ №{orderId}\nЗаказ отправлен менеджеру\nСкоро с вами свяжутся для уточнения деталей!")
 
 #=================================================Устройство на работу=========================================================
 
@@ -758,7 +758,7 @@ async def client_chat_handler(message: Message,state: FSMContext):
     print('FSMChat.chat_id_client')
     print(data)
     #await bot.send_message(chat_id=data["chat_id_client"], text=str(message.photo), reply_markup=chatMenu)
-    contact = sqllite_db.sql_get_contact_by_id(chat_id=message.chat.id)
+    contact = await sqllite_db.sql_get_contact_by_id(chat_id=message.chat.id)
     if(message.text):
         await bot.send_message(chat_id=data["chat_id_manager"],text=f"Сообщение от @{contact['Name']} chat_id: {message.chat.id}:\n{message.text}", reply_markup=chatMenu)
     if message.photo:
